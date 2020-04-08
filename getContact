@@ -1,0 +1,38 @@
+```java
+package com.test;
+
+import com.alibaba.fastjson.JSONObject;
+import com.bean.Contact;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class test2 {
+    public List<Contact> getContactList(String Authorization) throws IOException {
+        List<Contact> contacts = new ArrayList<Contact>(); //创建contact列表
+        String url = "http://111.220.37:4000//contact-group/contact/list"; //接口url
+        OkHttpClient okHttpClient = new OkHttpClient(); //创建okhttp对象
+        Request.Builder reqBuild = new Request.Builder(); //创建请求的建造类
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(url).newBuilder(); //创建url的建造类
+        urlBuilder.addQueryParameter("id", "4"); //向url添加paramas
+        Request request = reqBuild.url(urlBuilder.build()) //实例化request
+                .addHeader("Content-Type", "aplication/json")
+                .header("Authorization", Authorization)
+                .get()
+                .build();
+        Response response = okHttpClient.newCall(request).execute(); //发送get请求获得响应体
+        if(response.isSuccessful()){ //如果获得响应体成功
+            String str1 = response.body().string(); //获得响应体的字符串
+            String str2 = JSONObject.parseObject(str1).get("data").toString(); //获得响应体中data的字符串
+            contacts = JSONObject.parseArray(str2, Contact.class);//将data中的列表转换成对象列表
+            return contacts; //返回contact列表
+        }
+        return null; //没有返回Null
+    }
+}
+```
